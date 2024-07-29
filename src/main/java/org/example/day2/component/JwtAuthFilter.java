@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.day2.service.auth.JWTService;
+import org.example.day2.service.auth.UserService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,9 +18,11 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthFilter  extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
+
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(
@@ -29,8 +35,18 @@ public class JwtAuthFilter  extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = authHeader.substring(7);
-        String email = jwtService.extractEmail(token);
-
+        var token = authHeader.substring(7);
+        var email = jwtService.extractEmail(token);
+        var user = userService.getUserDetails(email);
+        if (
+                user != null
+                        && SecurityContextHolder.getContext().getAuthentication() == null
+                        && jwtService.validateToken(token, user)
+        ) {
+            var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+        filterChain.doFilter(request, response);
     }
 }

@@ -1,4 +1,4 @@
-package org.example.day2.model;
+package org.example.day2.model.user;
 
 public record User(
         int id,
@@ -6,3 +6,4 @@ public record User(
         String password
 ) {
 }
+

@@ -4,10 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.example.day2.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -26,10 +26,10 @@ public class JWTService {
 
     public boolean validateToken(
             @NonNull String token,
-            @NonNull User user
+            @NonNull UserDetails user
     ) {
         String email = extractEmail(token);
-        if (!user.email().equals(email)) return false;
+        if (!user.getUsername().equals(email)) return false;
         return extractClaims(token, Claims::getExpiration).after(new Date());
     }
 
@@ -51,9 +51,9 @@ public class JWTService {
                 .getPayload();
     }
 
-    private String createJWT(User user) {
+    public String createJWT(String email) {
         return Jwts.builder()
-                .subject(user.email())
+                .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSecretKey())
