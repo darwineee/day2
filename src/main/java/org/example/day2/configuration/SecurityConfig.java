@@ -17,8 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
-            "/user/login",
-            "/user/register"
+            "/auth/login",
+            "/auth/signup"
     };
 
     private final JwtAuthFilter jwtAuthFilter;

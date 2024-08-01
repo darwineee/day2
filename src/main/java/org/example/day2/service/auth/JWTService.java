@@ -4,9 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +20,26 @@ public class JWTService {
     @Value("${jwt.secret}")
     private String secret;
 
-    public @Nullable String extractEmail(@NonNull String token) {
+    public @Nullable String extractEmail(@NotNull String token) {
         return extractClaims(token, Claims::getSubject);
     }
 
     public boolean validateToken(
-            @NonNull String token,
-            @NonNull UserDetails user
+            @NotNull String token,
+            @NotNull UserDetails user
     ) {
         String email = extractEmail(token);
         if (!user.getUsername().equals(email)) return false;
         return extractClaims(token, Claims::getExpiration).after(new Date());
+    }
+
+    public String generateToken(@NotNull String email) {
+        return Jwts.builder()
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .signWith(getSecretKey())
+                .compact();
     }
 
     private <T> T extractClaims(String token, Function<Claims, T> select) {
@@ -49,14 +58,5 @@ public class JWTService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    public String createJWT(String email) {
-        return Jwts.builder()
-                .subject(email)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
-                .signWith(getSecretKey())
-                .compact();
     }
 }

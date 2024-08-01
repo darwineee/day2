@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.example.day2.service.auth.JWTService;
-import org.example.day2.service.auth.UserService;
+import org.example.day2.service.user.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -39,8 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         var email = jwtService.extractEmail(token);
         var user = userService.getUserDetails(email);
         if (
-                user != null
-                        && SecurityContextHolder.getContext().getAuthentication() == null
+                SecurityContextHolder.getContext().getAuthentication() == null
                         && jwtService.validateToken(token, user)
         ) {
             var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
