@@ -1,4 +1,4 @@
-package org.example.day2.service.auth;
+package org.example.day2.component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,17 +8,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
-@Service
-public class JWTService {
+@Component
+public class JWTHelper {
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Value("${jwt.expr}")
+    private long expr;
 
     public @Nullable String extractEmail(@NotNull String token) {
         return extractClaims(token, Claims::getSubject);
@@ -37,7 +40,7 @@ public class JWTService {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + expr))
                 .signWith(getSecretKey())
                 .compact();
     }

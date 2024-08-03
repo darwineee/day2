@@ -6,10 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.example.day2.service.auth.JWTService;
-import org.example.day2.service.user.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,9 +19,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JWTService jwtService;
+    private final JWTHelper jwtHelper;
 
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -36,11 +35,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         var token = authHeader.substring(7);
-        var email = jwtService.extractEmail(token);
-        var user = userService.getUserDetails(email);
+        var email = jwtHelper.extractEmail(token);
+        var user = userDetailsService.loadUserByUsername(email);
         if (
                 SecurityContextHolder.getContext().getAuthentication() == null
-                        && jwtService.validateToken(token, user)
+                        && jwtHelper.validateToken(token, user)
         ) {
             var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

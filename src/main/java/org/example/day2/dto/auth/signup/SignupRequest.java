@@ -8,7 +8,7 @@ import org.example.day2.utils.RegexP;
 public record SignupRequest(
         @NotBlank(message = Message.VALIDATION_EMAIL_BLANK)
         String email,
-        @Pattern(regexp = RegexP.VALIDATE_PWD, message = Message.VALIDATION_PWD_BLANK)
+        @Pattern(regexp = RegexP.VALIDATE_PWD, message = Message.VALIDATION_PWD_REQ)
         String password
 ) {
 }

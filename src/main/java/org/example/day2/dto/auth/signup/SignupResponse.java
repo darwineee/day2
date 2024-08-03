@@ -6,6 +6,6 @@ import lombok.Builder;
 public record SignupResponse(
         int id,
         String email,
-        boolean inactive
+        boolean active
 ) {
 }
