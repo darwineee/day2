@@ -1,9 +1,9 @@
-package org.example.day2.dto.auth.signup;
+package org.example.day2.core.dto.auth.signup;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.example.day2.utils.Message;
-import org.example.day2.utils.RegexP;
+import org.example.day2.core.utils.Message;
+import org.example.day2.core.utils.RegexP;
 
 public record SignupRequest(
         @NotBlank(message = Message.VALIDATION_EMAIL_BLANK)

@@ -19,7 +19,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JWTHelper jwtHelper;
+    private final JwtHelper jwtHelper;
 
     private final UserDetailsService userDetailsService;
 

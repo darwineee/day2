@@ -1,4 +1,4 @@
-package org.example.day2.utils;
+package org.example.day2.core.utils;
 
 public class Message {
     public static final String VALIDATION_EMAIL_BLANK = "Email must not be blank.";

@@ -1,6 +1,6 @@
-package org.example.day2.exception;
+package org.example.day2.core.exception;
 
-import org.example.day2.utils.Message;
+import org.example.day2.core.utils.Message;
 
 public class UnknownException extends Exception {
     @Override

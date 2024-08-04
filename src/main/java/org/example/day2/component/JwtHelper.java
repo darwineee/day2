@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Component
-public class JWTHelper {
+public class JwtHelper {
 
     @Value("${jwt.secret}")
     private String secret;

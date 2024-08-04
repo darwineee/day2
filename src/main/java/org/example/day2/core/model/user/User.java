@@ -1,11 +1,13 @@
-package org.example.day2.dto.auth.signup;
+package org.example.day2.core.model.user;
 
 import lombok.Builder;
 
 @Builder
-public record SignupResponse(
+public record User(
         int id,
         String email,
+        String password,
         boolean active
 ) {
 }
+
