@@ -8,5 +8,7 @@ public class Message {
     public static final String ERR_USER_EXISTED = "User with this email already exists.";
     public static final String ERR_USER_NOT_FOUND = "User with this email not found.";
 
+    public static final String ROOM_UNAVAILABLE = "Room unavailable.";
+
     public static final String ERR_INTERNAL = "Internal error.";
 }
