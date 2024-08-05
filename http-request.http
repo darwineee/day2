@@ -1,0 +1,34 @@
+###
+POST http://localhost:8080/api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "123456"
+}
+
+###
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@mail.com",
+  "password": "123456"
+}
+
+> {% client.global.set("auth_token", response.body.token) %}
+
+###
+GET http://localhost:8080/api/v1/rooms
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://localhost:8080/api/v1/booking
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+###
+GET http://localhost:8080/api/v1/booking/{{$random.integer()}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}

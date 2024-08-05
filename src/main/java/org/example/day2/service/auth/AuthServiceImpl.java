@@ -29,21 +29,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignupResponse signUp(@NotNull SignupRequest request) throws UserExistedException, UnknownException {
         if (userRepository.isUserExist(request.email())) throw new UserExistedException();
-        userRepository.save(
-                User.builder()
-                        .email(request.email())
-                        .password(passwordEncoder.encode(request.password()))
-                        .active(true)
-                        .build()
-        );
+        var encodedPassword = passwordEncoder.encode(request.password());
+        userRepository.save(User.from(request, encodedPassword));
         return userRepository.findByIdentity(request.email())
-                .map(user ->
-                        SignupResponse.builder()
-                                .id(user.id())
-                                .email(user.email())
-                                .active(user.active())
-                                .build()
-                )
+                .map(SignupResponse::from)
                 .orElseThrow(UnknownException::new);
     }
 
@@ -57,13 +46,7 @@ public class AuthServiceImpl implements AuthService {
         );
         var token = jwtHelper.generateToken(request.email());
         return userRepository.findByIdentity(request.email())
-                .map(user ->
-                        LoginResponse.builder()
-                                .id(user.id())
-                                .email(user.email())
-                                .token(token)
-                                .build()
-                )
+                .map(user -> LoginResponse.from(user, token))
                 .orElseThrow(UnknownException::new);
     }
 }

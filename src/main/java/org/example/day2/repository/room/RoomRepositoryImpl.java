@@ -21,4 +21,22 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .query(Room.class)
                 .list();
     }
+
+    @Override
+    public Room findRoomById(int roomId) {
+        var sql = "select * from rooms where id = :roomId";
+        return jdbcClient.sql(sql)
+                .param("roomId", roomId)
+                .query(Room.class)
+                .single();
+    }
+
+    @Override
+    public Room findRoomByIdWithLock(int roomId) {
+        var sql = "select * from rooms where id = :roomId for update";
+        return jdbcClient.sql(sql)
+                .param("roomId", roomId)
+                .query(Room.class)
+                .single();
+    }
 }

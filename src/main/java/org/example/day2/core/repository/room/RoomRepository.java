@@ -5,5 +5,7 @@ import org.example.day2.core.model.room.Room;
 import java.util.List;
 
 public interface RoomRepository {
-    public List<Room> findAll();
+    List<Room> findAll();
+    Room findRoomById(int roomId);
+    Room findRoomByIdWithLock(int roomId);
 }
