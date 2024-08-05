@@ -7,15 +7,16 @@ create table if not exists users (
 
 create table if not exists rooms (
     id serial primary key,
-    room_class char(1) not null
+    room_class char(1) not null,
+    on_booking boolean not null default false
 );
 
 create table if not exists reservations (
     id serial primary key,
     user_id int not null,
     room_id int not null,
-    check_in date not null,
-    check_out date not null,
+    check_in timestamp not null,
+    check_out timestamp not null,
     constraint fk_user foreign key(user_id) references users(id),
     constraint fk_room foreign key(room_id) references rooms(id)
 );

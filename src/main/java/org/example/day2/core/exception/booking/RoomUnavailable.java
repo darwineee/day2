@@ -1,10 +1,15 @@
 package org.example.day2.core.exception.booking;
 
-import org.example.day2.core.utils.Message;
+public class RoomUnavailable extends Exception {
 
-public class RoomUnavailable extends RuntimeException {
+    private final String msg;
+
+    public RoomUnavailable(String message) {
+        msg = message;
+    }
+
     @Override
     public String getMessage() {
-        return Message.ROOM_UNAVAILABLE;
+        return msg;
     }
 }

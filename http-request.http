@@ -29,6 +29,13 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 ###
-GET http://localhost:8080/api/v1/booking/{{$random.integer()}}
+POST http://localhost:8080/api/v1/booking
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
+
+{
+  "userId": 1,
+  "roomId": 1,
+  "checkIn": "2024-08-11T10:10:10",
+  "checkOut": "2024-08-12T10:10:10"
+}

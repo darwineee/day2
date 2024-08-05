@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record Room(
         int id,
-        char roomClass
+        char roomClass,
+        boolean onBooking
 ) {
 }

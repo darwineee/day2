@@ -2,7 +2,6 @@ package org.example.day2.repository.reservation;
 
 import lombok.RequiredArgsConstructor;
 import org.example.day2.core.model.reservation.Reservation;
-import org.example.day2.core.model.room.Room;
 import org.example.day2.core.repository.reservation.ReservationRepository;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -34,15 +33,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public void insertBooking(Reservation reservation) {
-        var sql = """
-                insert into reservations (user_id, room_id, check_in, check_out)
-                values (:userId, :roomId, :checkIn, :checkOut)
-               """.stripIndent();
+        var sql = "insert into reservations (user_id, room_id, check_in, check_out) values (:userId, :roomId, :checkIn, :checkOut)";
         jdbcClient.sql(sql)
-                .param("user_id", reservation.userId())
-                .param("room_id", reservation.roomId())
-                .param("check_in", reservation.checkIn())
-                .param("check_out", reservation.checkOut())
+                .param("userId", reservation.userId())
+                .param("roomId", reservation.roomId())
+                .param("checkIn", reservation.checkIn())
+                .param("checkOut", reservation.checkOut())
                 .update();
     }
 

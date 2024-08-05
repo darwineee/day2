@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,20 +24,19 @@ public class RoomRepositoryImpl implements RoomRepository {
     }
 
     @Override
-    public Room findRoomById(int roomId) {
-        var sql = "select * from rooms where id = :roomId";
-        return jdbcClient.sql(sql)
+    public Optional<Room> acquireRoomWithLock(int roomId) {
+        return jdbcClient.sql("select * from rooms where id = :roomId for share")
                 .param("roomId", roomId)
                 .query(Room.class)
-                .single();
+                .optional();
     }
 
     @Override
-    public Room findRoomByIdWithLock(int roomId) {
-        var sql = "select * from rooms where id = :roomId for update";
-        return jdbcClient.sql(sql)
+    public void setLock(int roomId, boolean lock) {
+        jdbcClient
+                .sql("update rooms set on_booking = :lock where id = :roomId")
+                .param("lock", lock)
                 .param("roomId", roomId)
-                .query(Room.class)
-                .single();
+                .update();
     }
 }
