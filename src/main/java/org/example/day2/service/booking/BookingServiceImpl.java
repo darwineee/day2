@@ -10,11 +10,14 @@ import org.example.day2.core.repository.room.RoomRepository;
 import org.example.day2.core.repository.user.UserRepository;
 import org.example.day2.core.service.booking.BookingService;
 import org.example.day2.core.utils.Message;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -23,10 +26,13 @@ public class BookingServiceImpl implements BookingService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final int ROOM_BOOKING_PERIOD = 3; //minutes
 
     @Override
-    public GetUserBookingResponse getUserBooking(GetUserBookingRequest request) throws UserNotFoundException {
-        var user = userRepository.findByIdentity(request.email());
+    public GetUserBookingResponse getUserBooking(String userEmail) throws UserNotFoundException {
+        var user = userRepository.findByIdentity(userEmail);
         if (user.isEmpty()) throw new UserNotFoundException();
         var data = reservationRepository.findAllByUserId(user.get().id());
         return GetUserBookingResponse.builder()
@@ -36,26 +42,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(
             rollbackFor = RoomUnavailable.class,
-            timeout = 300,
             isolation = Isolation.REPEATABLE_READ
     )
     @Override
-    public BookingResponse booking(BookingRequest request) throws RoomUnavailable {
-        var room = roomRepository.acquireRoomWithLock(request.roomId());
-        if (room.isEmpty()) throw new RoomUnavailable(Message.ROOM_ID_INVALID);
-        if (room.get().onBooking()) throw new RoomUnavailable(Message.ROOM_ON_BOOKING);
-        roomRepository.setLock(request.roomId(), true);
-        var isConflict = reservationRepository
-                .findAllByUserId(request.userId())
+    public BookingResponse booking(BookingRequest request, String userEmail) throws RoomUnavailable, UserNotFoundException {
+        var userId = userRepository.findByIdentity(userEmail)
+                .orElseThrow(UserNotFoundException::new)
+                .id();
+        roomRepository
+                .findById(request.roomId())
+                .orElseThrow(() -> new RoomUnavailable(Message.ROOM_ID_INVALID));
+        var key = "lock:room-booking:" + request.roomId();
+        var value = UUID.randomUUID().toString();
+        var acquiredLock = redisTemplate
+                .opsForValue()
+                .setIfAbsent(key, value, ROOM_BOOKING_PERIOD, TimeUnit.MINUTES);
+        if (Boolean.FALSE.equals(acquiredLock)) throw new RoomUnavailable(Message.ROOM_ON_BOOKING);
+        var isPeriodConflict = reservationRepository
+                .findAllByUserId(userId)
                 .stream()
                 .anyMatch(reservation ->
                         inDateRange(request.checkIn(), reservation.checkIn(), reservation.checkOut())
                                 || inDateRange(request.checkOut(), reservation.checkIn(), reservation.checkOut())
                 );
-        if (isConflict) throw new RoomUnavailable(Message.ROOM_UNAVAILABLE);
-        reservationRepository.insertBooking(Reservation.from(request));
-        var reservations = reservationRepository.findAllByUserId(request.userId());
-        roomRepository.setLock(request.roomId(), false);
+        if (isPeriodConflict) throw new RoomUnavailable(Message.ROOM_UNAVAILABLE);
+        reservationRepository.insertBooking(Reservation.from(request, userId));
+        var reservations = reservationRepository.findAllByUserId(userId);
+        redisTemplate.delete(key);
         return BookingResponse.builder().reservations(reservations).build();
     }
 

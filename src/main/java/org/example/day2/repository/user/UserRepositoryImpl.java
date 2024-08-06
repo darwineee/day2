@@ -5,6 +5,7 @@ import org.example.day2.core.model.user.User;
 import org.example.day2.core.repository.user.UserRepository;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -13,14 +14,10 @@ import java.util.Optional;
 public class UserRepositoryImpl implements UserRepository {
     private final JdbcClient jdbcClient;
 
-    @Override
-    public boolean isUserExist(String identity) {
-        return findByIdentity(identity).isPresent();
-    }
-
+    @Transactional
     @Override
     public Optional<User> findByIdentity(String identity) {
-        String sql = "select * from users where email = :email";
+        String sql = "select * from users where email = :email and active = true";
         return jdbcClient.sql(sql)
                 .param("email", identity)
                 .query(User.class)

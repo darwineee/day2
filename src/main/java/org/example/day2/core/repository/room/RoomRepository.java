@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface RoomRepository {
     List<Room> findAll();
-    Optional<Room> acquireRoomWithLock(int roomId);
-    void setLock(int roomId, boolean lock);
+    Optional<Room> findById(int id);
 }

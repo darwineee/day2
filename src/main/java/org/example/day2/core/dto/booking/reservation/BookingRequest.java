@@ -10,11 +10,6 @@ import java.time.LocalDateTime;
 
 @DateRange(startDateField = "checkIn", endDateField = "checkOut")
 public record BookingRequest(
-
-        @Min(0)
-        @Max(Integer.MAX_VALUE)
-        int userId,
-
         @Min(0)
         @Max(Integer.MAX_VALUE)
         int roomId,

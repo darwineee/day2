@@ -3,7 +3,6 @@ package org.example.day2.controller;
 import org.example.day2.core.dto.wrapper.ErrorRsp;
 import org.example.day2.core.exception.UnknownException;
 import org.example.day2.core.utils.ErrCode;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;

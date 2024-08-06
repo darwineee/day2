@@ -28,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public SignupResponse signUp(@NotNull SignupRequest request) throws UserExistedException, UnknownException {
-        if (userRepository.isUserExist(request.email())) throw new UserExistedException();
+        if (userRepository.findByIdentity(request.email()).isPresent()) throw new UserExistedException();
         var encodedPassword = passwordEncoder.encode(request.password());
         userRepository.save(User.from(request, encodedPassword));
         return userRepository.findByIdentity(request.email())

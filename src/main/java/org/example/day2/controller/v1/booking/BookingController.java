@@ -24,10 +24,8 @@ public class BookingController {
     public ResponseEntity<GetUserBookingResponse> getUserBooking(
             @RequestHeader("Authorization") String authHeader
     ) throws UserNotFoundException {
-        var token = authHeader.substring(7);
-        var email = jwtHelper.extractEmail(token);
-        var request = new GetUserBookingRequest(email);
-        var response = bookingService.getUserBooking(request);
+        var email = jwtHelper.requireEmail(authHeader);
+        var response = bookingService.getUserBooking(email);
         return ResponseEntity.ok(response);
     }
 
@@ -35,9 +33,11 @@ public class BookingController {
     public ResponseEntity<BookingResponse> addBooking(
             @Valid
             @RequestBody
-            BookingRequest bookingRequest
-    ) throws RoomUnavailable {
-        var response = bookingService.booking(bookingRequest);
+            BookingRequest bookingRequest,
+            @RequestHeader("Authorization") String authHeader
+    ) throws RoomUnavailable, UserNotFoundException {
+        var email = jwtHelper.requireEmail(authHeader);
+        var response = bookingService.booking(bookingRequest, email);
         return ResponseEntity.ok(response);
     }
 

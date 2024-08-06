@@ -19,9 +19,9 @@ public record Reservation(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = TimeP.ISO8601_DATETIME)
         LocalDateTime checkOut
 ) {
-    public static Reservation from(BookingRequest request) {
+    public static Reservation from(BookingRequest request, int userId) {
         return Reservation.builder()
-                .userId(request.userId())
+                .userId(userId)
                 .roomId(request.roomId())
                 .checkIn(request.checkIn())
                 .checkOut(request.checkOut())

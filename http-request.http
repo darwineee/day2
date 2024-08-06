@@ -34,7 +34,6 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "userId": 1,
   "roomId": 1,
   "checkIn": "2024-08-11T10:10:10",
   "checkOut": "2024-08-12T10:10:10"

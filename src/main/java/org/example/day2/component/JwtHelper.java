@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.graalvm.collections.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +24,29 @@ public class JwtHelper {
     @Value("${jwt.expr}")
     private long expr;
 
-    public @Nullable String extractEmail(@NotNull String token) {
+    public @Nullable Pair<String, String> extractCredentialsFromBearer(@Nullable String bearer) {
+        if (bearer == null) return null;
+        if (!bearer.startsWith("Bearer ")) return null;
+        var token = bearer.substring(7);
+        var email = extractEmailFromToken(token);
+        if (email == null) return null;
+        return Pair.create(token, email);
+    }
+
+    public @Nullable String extractEmailFromToken(@NotNull String token) {
+        return extractClaims(token, Claims::getSubject);
+    }
+
+    public String requireEmail(String bearer) {
+        var token = bearer.substring(7);
         return extractClaims(token, Claims::getSubject);
     }
 
     public boolean validateToken(
             @NotNull String token,
+            @NotNull String email,
             @NotNull UserDetails user
     ) {
-        String email = extractEmail(token);
         if (!user.getUsername().equals(email)) return false;
         return extractClaims(token, Claims::getExpiration).after(new Date());
     }

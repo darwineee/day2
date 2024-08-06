@@ -7,8 +7,7 @@ create table if not exists users (
 
 create table if not exists rooms (
     id serial primary key,
-    room_class char(1) not null,
-    on_booking boolean not null default false
+    room_class char(1) not null
 );
 
 create table if not exists reservations (

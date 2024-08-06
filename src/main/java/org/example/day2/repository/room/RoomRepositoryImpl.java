@@ -5,6 +5,7 @@ import org.example.day2.core.model.room.Room;
 import org.example.day2.core.repository.room.RoomRepository;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,20 +24,13 @@ public class RoomRepositoryImpl implements RoomRepository {
                 .list();
     }
 
+    @Transactional
     @Override
-    public Optional<Room> acquireRoomWithLock(int roomId) {
-        return jdbcClient.sql("select * from rooms where id = :roomId for share")
-                .param("roomId", roomId)
+    public Optional<Room> findById(int id) {
+        var sql = "select * from rooms where id = :id";
+        return jdbcClient.sql(sql)
+                .param("id", id)
                 .query(Room.class)
                 .optional();
-    }
-
-    @Override
-    public void setLock(int roomId, boolean lock) {
-        jdbcClient
-                .sql("update rooms set on_booking = :lock where id = :roomId")
-                .param("lock", lock)
-                .param("roomId", roomId)
-                .update();
     }
 }
