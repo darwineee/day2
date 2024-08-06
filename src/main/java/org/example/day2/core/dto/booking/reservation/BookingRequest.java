@@ -23,7 +23,6 @@ public record BookingRequest(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = TimeP.ISO8601_DATETIME)
         LocalDateTime checkIn,
 
-        @Future
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = TimeP.ISO8601_DATETIME)
         LocalDateTime checkOut
 

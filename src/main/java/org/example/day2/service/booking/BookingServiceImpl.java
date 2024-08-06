@@ -60,6 +60,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private boolean inDateRange(LocalDateTime src, LocalDateTime start, LocalDateTime end) {
-        return src.isAfter(start) && src.isBefore(end);
+        return src.isEqual(start) || src.isEqual(end) || (src.isAfter(start) && src.isBefore(end));
     }
 }
